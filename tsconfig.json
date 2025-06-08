@@ -8,6 +8,18 @@
     },
     {
       "path": "./apps/chinese-listening-trainer"
+    },
+    {
+      "path": "./libs"
+    },
+    {
+      "path": "./libs/chinese-phonetics"
+    },
+    {
+      "path": "./libs/training-engine"
+    },
+    {
+      "path": "./libs/audio-tts"
     }
   ]
 }

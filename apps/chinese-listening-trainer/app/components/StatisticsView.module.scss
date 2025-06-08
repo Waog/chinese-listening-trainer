@@ -1,0 +1,624 @@
+// StatisticsView styles with dark flat theme
+.container {
+  min-height: 100vh;
+  background: #1a1a1a; // Dark theme
+  color: white;
+  padding: 1rem;
+  padding-bottom: 120px; // Add space for fixed navigation
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    padding-bottom: 120px;
+  }
+
+  @media (min-width: 769px) {
+    padding-bottom: 1rem; // Remove extra padding on desktop
+  }
+}
+
+// Keep the original class name for backward compatibility
+.statisticsContainer {
+  min-height: 100vh;
+  background: #1a1a1a; // Dark theme
+  color: white;
+  padding: 1rem;
+  padding-bottom: 120px; // Add space for fixed navigation
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    padding-bottom: 120px;
+  }
+
+  @media (min-width: 769px) {
+    padding-bottom: 1rem; // Remove extra padding on desktop
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    color: white;
+    font-size: 2.5rem;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  .subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+.controls {
+  background: #2a2a2a;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #333;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .controlRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .filterGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px;
+
+    @media (max-width: 768px) {
+      min-width: unset;
+    }
+
+    label {
+      color: white;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    select {
+      background: #333;
+      border: 1px solid #555;
+      color: white;
+      padding: 0.5rem;
+      flex: 1;
+      min-width: 120px;
+
+      &:focus {
+        outline: none;
+        border-color: #777;
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      option {
+        background: #2a2a2a;
+        color: white;
+      }
+    }
+  }
+
+  .sortGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    label {
+      color: white;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    select {
+      background: #333;
+      border: 1px solid #555;
+      color: white;
+      padding: 0.5rem;
+      min-width: 140px;
+
+      &:focus {
+        outline: none;
+        border-color: #777;
+        background: #3a3a3a;
+      }
+      option {
+        background: #2a2a2a;
+        color: white;
+      }
+    }
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  .statValue {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  .statLabel {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+.detailsSection {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    @media (max-width: 768px) {
+      font-size: 1.3rem;
+    }
+  }
+}
+
+.syllableGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+}
+
+.syllableCard {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.75rem;
+  text-align: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+  }
+
+  .syllableName {
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+
+  .syllableStats {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    line-height: 1.2;
+
+    @media (max-width: 768px) {
+      font-size: 0.75rem;
+    }
+  }
+
+  &.errorHigh {
+    border-color: rgba(255, 107, 107, 0.5);
+    background: rgba(255, 107, 107, 0.1);
+  }
+
+  &.errorMedium {
+    border-color: rgba(255, 193, 7, 0.5);
+    background: rgba(255, 193, 7, 0.1);
+  }
+
+  &.errorLow {
+    border-color: rgba(72, 187, 120, 0.5);
+    background: rgba(72, 187, 120, 0.1);
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: rgba(255, 255, 255, 0.7);
+
+  .emptyIcon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+
+    @media (max-width: 768px) {
+      font-size: 3rem;
+    }
+  }
+
+  .emptyTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: white;
+
+    @media (max-width: 768px) {
+      font-size: 1.3rem;
+    }
+  }
+
+  .emptyMessage {
+    font-size: 1rem;
+    line-height: 1.5;
+
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Animation for loading states
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.statsGrid > *,
+.syllableGrid > * {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Responsive improvements
+@media (max-width: 480px) {
+  .statisticsContainer {
+    padding: 0.25rem;
+  }
+
+  .controls {
+    padding: 0.75rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  .syllableGrid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+}
+
+// Missing CSS classes that JSX expects
+.overallStats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    gap: 1rem;
+  }
+}
+
+.overallStat {
+  background: #2a2a2a;
+  padding: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid #333;
+  min-width: 120px;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    min-width: 100px;
+  }
+}
+
+.statNumber {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+.statLabel {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.searchInput {
+  background: #333;
+  border: 1px solid #555;
+  color: white;
+  padding: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+
+  &:focus {
+    outline: none;
+    border-color: #777;
+    background: #3a3a3a;
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.tableContainer {
+  background: #2a2a2a;
+  border-bottom: 1px solid #333;
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.statsTable {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+
+  th {
+    background: #333;
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 1px solid #555;
+    white-space: nowrap;
+
+    &:hover {
+      background: #3a3a3a;
+    }
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #333;
+  }
+}
+
+.statRow {
+  &:hover {
+    background: #2a2a2a;
+  }
+}
+
+.componentCell {
+  .componentBadge {
+    background: #007acc;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+}
+
+.valueCell {
+  font-weight: 500;
+}
+
+.attemptsCell {
+  .attempts {
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+
+  .successes {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+}
+
+.successRateCell {
+  .successRate {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+
+    &.excellent {
+      color: #28a745;
+    }
+
+    &.good {
+      color: #ffc107;
+    }
+
+    &.okay {
+      color: #fd7e14;
+    }
+
+    &.poor {
+      color: #dc3545;
+    }
+  }
+
+  .progressBar {
+    width: 100%;
+    height: 4px;
+    background: #333;
+    overflow: hidden;
+
+    .progressFill {
+      height: 100%;
+      background: #007acc;
+      transition: width 0.3s ease;
+    }
+  }
+}
+
+.lastTrainedCell {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.summary {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  padding: 1rem;
+}
+
+// Success rate color classes
+.excellent {
+  color: #28a745 !important;
+}
+
+.good {
+  color: #ffc107 !important;
+}
+
+.okay {
+  color: #fd7e14 !important;
+}
+
+.poor {
+  color: #dc3545 !important;
+}
+
+// Select dropdown styling
+.select {
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 0;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  min-width: 160px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #3a3a3a;
+    border-color: #555;
+  }
+
+  &:focus {
+    background: #3a3a3a;
+    border-color: #007acc;
+    box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+  }
+
+  option {
+    background: #333;
+    color: white;
+    padding: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+// Clear button styling
+.clearButton {
+  background: #dc3545;
+  border: none;
+  border-radius: 0;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    background: #bd2130;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+}

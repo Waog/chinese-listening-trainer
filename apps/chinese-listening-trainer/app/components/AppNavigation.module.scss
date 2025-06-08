@@ -1,0 +1,193 @@
+// Navigation styles with dark theme and flat design
+.navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 0;
+  background: #2a2a2a;
+  border-top: 1px solid #333;
+
+  @media (min-width: 769px) {
+    position: static;
+    background: #1a1a1a;
+    border-top: none;
+    border-bottom: 1px solid #333;
+    margin-bottom: 2rem;
+  }
+}
+
+.navContainer {
+  background: #2a2a2a;
+  border: none;
+  border-radius: 0;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: none;
+  margin: 0;
+  @media (min-width: 769px) {
+    background: #1a1a1a;
+    border-radius: 0;
+    padding: 1rem;
+    justify-content: center;
+    gap: 2rem;
+  }
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+  flex: 1;
+  max-width: 80px;
+  position: relative;
+
+  @media (min-width: 769px) {
+    flex: none;
+    max-width: none;
+    min-width: 100px;
+    padding: 1rem 1.5rem;
+    gap: 0.5rem;
+  }
+
+  &:hover {
+    color: white;
+    background: #333;
+  }
+
+  &.active {
+    color: white;
+    background: #333;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #4facfe;
+
+      @media (min-width: 769px) {
+        top: auto;
+        bottom: 0;
+      }
+    }
+  }
+}
+
+.navIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+
+  @media (min-width: 769px) {
+    font-size: 1.75rem;
+  }
+}
+
+.navLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+
+  @media (min-width: 769px) {
+    font-size: 0.9rem;
+  }
+}
+
+// Add spacing for fixed navigation on mobile
+.navigation ~ * {
+  @media (max-width: 768px) {
+    margin-bottom: 100px;
+  }
+}
+
+// Animation for smooth transitions
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.navContainer {
+  animation: slideUp 0.3s ease-out;
+}
+
+// Responsive improvements for very small screens
+@media (max-width: 320px) {
+  .navContainer {
+    padding: 0.5rem;
+  }
+
+  .navItem {
+    padding: 0.5rem 0.75rem;
+    max-width: 70px;
+  }
+
+  .navIcon {
+    font-size: 1.25rem;
+  }
+
+  .navLabel {
+    font-size: 0.7rem;
+  }
+}
+
+// Desktop-specific styles
+@media (min-width: 769px) {
+  .navigation {
+    margin-bottom: 0;
+  }
+
+  .navContainer {
+    background: #1a1a1a;
+  }
+
+  .navItem {
+    &:hover {
+      background: #333;
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .navContainer {
+    background: #2a2a2a;
+    border: 1px solid #555;
+  }
+
+  .navItem {
+    color: white;
+
+    &.active {
+      background: #333;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .navContainer {
+    animation: none;
+  }
+
+  .navItem {
+    transition: none;
+  }
+}

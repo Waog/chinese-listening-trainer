@@ -1,0 +1,472 @@
+// SettingsView styles with glassmorphism and responsive design
+.settingsContainer {
+  min-height: 100vh;
+  background: #1a1a1a; // Dark theme
+  color: white;
+  padding: 1rem;
+  padding-bottom: 120px; // Add space for fixed navigation
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    padding-bottom: 120px;
+  }
+
+  @media (min-width: 769px) {
+    padding-bottom: 1rem; // Remove extra padding on desktop
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    color: white;
+    font-size: 2.5rem;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  .subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+.settingsContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settingsSection {
+  background: #2a2a2a;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #333;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin: 0 0 1.5rem 0;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+.settingGroup {
+  margin-bottom: 1.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
+}
+
+.settingLabel {
+  display: block;
+  color: white;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.settingSelect {
+  width: 100%;
+  background: #333;
+  border: 1px solid #555;
+  color: white;
+  padding: 0.75rem;
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: #777;
+    background: #3a3a3a;
+  }
+
+  option {
+    background: #2a2a2a;
+    color: white;
+  }
+}
+
+.rangeControls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+}
+
+.rangeInput {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+
+  label {
+    color: white;
+    font-weight: 500;
+    min-width: 40px;
+  }
+  select {
+    background: #333;
+    border: 1px solid #555;
+    color: white;
+    padding: 0.5rem;
+    flex: 1;
+
+    &:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    option {
+      background: #2a2a2a;
+      color: white;
+    }
+  }
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 1rem;
+
+  input[type='checkbox'] {
+    opacity: 0;
+    position: absolute;
+  }
+
+  .checkmark {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    position: relative;
+    transition: all 0.3s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 6px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+  }
+
+  input[type='checkbox']:checked + .checkmark {
+    background: rgba(72, 187, 120, 0.8);
+    border-color: rgba(72, 187, 120, 1);
+
+    &::after {
+      opacity: 1;
+    }
+  }
+
+  &:hover .checkmark {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.settingSlider {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  outline: none;
+  margin: 0.5rem 0;
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  &::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.testButton {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.toggleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+
+  // For three-column groups, allow buttons to wrap horizontally within each column
+  .threeColumnGroup & {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+}
+
+.toggleButton {
+  background: #333;
+  border: 1px solid #555;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+  text-align: center;
+
+  // Smaller buttons for three-column layout
+  .threeColumnGroup & {
+    padding: 0.5rem 0.75rem;
+    min-width: 50px;
+    font-size: 0.9rem;
+  }
+
+  &:hover {
+    background: #3a3a3a;
+  }
+
+  &.active {
+    background: #007acc;
+    border-color: #007acc;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #777;
+  }
+}
+
+.testFeedback {
+  color: #4caf50;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.helpContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.helpItem {
+  h3 {
+    color: white;
+    font-size: 1.1rem;
+    margin: 0 0 0.75rem 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 0.25rem 0;
+      font-size: 0.95rem;
+      line-height: 1.4;
+
+      &::before {
+        content: '•';
+        color: rgba(255, 255, 255, 0.6);
+        margin-right: 0.5rem;
+      }
+    }
+  }
+
+  kbd {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 0.15rem 0.3rem;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: white;
+    margin: 0 0.15rem;
+  }
+}
+
+.resetSection {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.resetButton {
+  background: #dc3545;
+  border: 1px solid #c82333;
+  color: white;
+  padding: 0.75rem 2rem;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.resetWarning {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+// Animation for smooth loading
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settingsSection {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+// Three-column layout for training filters
+.threeColumnGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    gap: 0.75rem;
+  }
+}
+
+// Improved tone button styling
+.toneButton {
+  .accent {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-left: 0.25rem;
+    display: inline-block;
+    line-height: 1;
+  }
+}
+
+// Responsive improvements for very small screens
+@media (max-width: 320px) {
+  .settingsContainer {
+    padding: 0.25rem;
+  }
+
+  .settingsSection {
+    padding: 0.75rem;
+  }
+
+  .helpContent {
+    grid-template-columns: 1fr;
+  }
+
+  .rangeControls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
