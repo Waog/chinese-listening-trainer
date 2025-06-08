@@ -21,7 +21,7 @@ export default defineConfig(() => ({
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {
-        enabled: false, // Disable PWA in development to avoid routing conflicts
+        enabled: true, // Enable PWA in development to test installation
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
@@ -40,6 +40,7 @@ export default defineConfig(() => ({
           process.env.NODE_ENV === 'production'
             ? '/chinese-listening-trainer/'
             : '/',
+        id: '/',
         lang: 'en',
         categories: ['education', 'productivity'],
         icons: [
@@ -47,19 +48,31 @@ export default defineConfig(() => ({
             src: 'pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
+          },
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
           {
             src: 'apple-touch-icon.png',
             sizes: '180x180',
             type: 'image/png',
-            purpose: 'apple touch icon',
+            purpose: 'any',
           },
         ],
       },

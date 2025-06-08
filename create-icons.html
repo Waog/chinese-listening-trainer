@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create PWA Icons</title>
+  </head>
+  <body>
+    <h1>Creating PWA Icons</h1>
+    <canvas
+      id="canvas192"
+      width="192"
+      height="192"
+      style="border: 1px solid black"
+    ></canvas>
+    <canvas
+      id="canvas512"
+      width="512"
+      height="512"
+      style="border: 1px solid black"
+    ></canvas>
+    <canvas
+      id="canvas180"
+      width="180"
+      height="180"
+      style="border: 1px solid black"
+    ></canvas>
+
+    <script>
+      // Create 192x192 icon
+      const canvas192 = document.getElementById('canvas192');
+      const ctx192 = canvas192.getContext('2d');
+
+      // Create gradient background
+      const gradient192 = ctx192.createLinearGradient(0, 0, 192, 192);
+      gradient192.addColorStop(0, '#667eea');
+      gradient192.addColorStop(1, '#764ba2');
+      ctx192.fillStyle = gradient192;
+      ctx192.fillRect(0, 0, 192, 192);
+
+      // Add text
+      ctx192.fillStyle = 'white';
+      ctx192.font = 'bold 24px sans-serif';
+      ctx192.textAlign = 'center';
+      ctx192.fillText('中文', 96, 80);
+      ctx192.font = 'bold 16px sans-serif';
+      ctx192.fillText('Listening', 96, 110);
+      ctx192.fillText('Trainer', 96, 130);
+
+      // Create 512x512 icon
+      const canvas512 = document.getElementById('canvas512');
+      const ctx512 = canvas512.getContext('2d');
+
+      const gradient512 = ctx512.createLinearGradient(0, 0, 512, 512);
+      gradient512.addColorStop(0, '#667eea');
+      gradient512.addColorStop(1, '#764ba2');
+      ctx512.fillStyle = gradient512;
+      ctx512.fillRect(0, 0, 512, 512);
+
+      ctx512.fillStyle = 'white';
+      ctx512.font = 'bold 64px sans-serif';
+      ctx512.textAlign = 'center';
+      ctx512.fillText('中文', 256, 220);
+      ctx512.font = 'bold 42px sans-serif';
+      ctx512.fillText('Listening', 256, 280);
+      ctx512.fillText('Trainer', 256, 330);
+
+      // Create 180x180 icon (Apple touch)
+      const canvas180 = document.getElementById('canvas180');
+      const ctx180 = canvas180.getContext('2d');
+
+      const gradient180 = ctx180.createLinearGradient(0, 0, 180, 180);
+      gradient180.addColorStop(0, '#667eea');
+      gradient180.addColorStop(1, '#764ba2');
+      ctx180.fillStyle = gradient180;
+      ctx180.fillRect(0, 0, 180, 180);
+
+      ctx180.fillStyle = 'white';
+      ctx180.font = 'bold 22px sans-serif';
+      ctx180.textAlign = 'center';
+      ctx180.fillText('中文', 90, 75);
+      ctx180.font = 'bold 15px sans-serif';
+      ctx180.fillText('Listening', 90, 100);
+      ctx180.fillText('Trainer', 90, 120);
+
+      // Function to download canvas as PNG
+      function downloadCanvas(canvas, filename) {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL();
+        link.click();
+      }
+
+      // Add download buttons
+      setTimeout(() => {
+        const downloadDiv = document.createElement('div');
+        downloadDiv.innerHTML = `
+                <h2>Download Icons</h2>
+                <button onclick="downloadCanvas(document.getElementById('canvas192'), 'pwa-192x192.png')">Download 192x192</button>
+                <button onclick="downloadCanvas(document.getElementById('canvas512'), 'pwa-512x512.png')">Download 512x512</button>
+                <button onclick="downloadCanvas(document.getElementById('canvas180'), 'apple-touch-icon.png')">Download 180x180</button>
+                <p>Save these files to: apps/chinese-listening-trainer/public/</p>
+            `;
+        document.body.appendChild(downloadDiv);
+      }, 100);
+    </script>
+  </body>
+</html>
