@@ -57,7 +57,9 @@ export function App() {
     <div className={styles.app}>
       <header className={styles.header}>
         <h1>Chinese Listening Trainer</h1>
-        <p>A Progressive Web App for improving your Chinese listening skills</p>
+        <p>
+          A Progressive Web App for improving your Chinese listening skills - v2
+        </p>
 
         {showInstallButton && (
           <button onClick={handleInstallClick} className={styles.installButton}>
