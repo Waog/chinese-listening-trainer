@@ -41,7 +41,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist/apps/chinese-listening-trainer'
+          path: './apps/chinese-listening-trainer/build/client'
 
   deploy:
     environment:
