@@ -3,8 +3,8 @@ import styles from './app.module.scss';
 
 export function App() {
   useEffect(() => {
-    // Register PWA service worker
-    if ('serviceWorker' in navigator) {
+    // Register PWA service worker only in production
+    if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/sw.js')

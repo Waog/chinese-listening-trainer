@@ -4,15 +4,23 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  type MetaFunction,
   type LinksFunction,
+  type MetaFunction,
 } from 'react-router';
 
-import { AppNav } from './app-nav';
+import '../styles.scss';
 
 export const meta: MetaFunction = () => [
   {
-    title: 'New Nx React Router App',
+    title: 'Chinese Listening Trainer',
+  },
+  {
+    name: 'description',
+    content: 'A Progressive Web App for Chinese listening training',
+  },
+  {
+    name: 'theme-color',
+    content: '#ffffff',
   },
 ];
 
@@ -27,6 +35,19 @@ export const links: LinksFunction = () => [
     rel: 'stylesheet',
     href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
   },
+  {
+    rel: 'icon',
+    type: 'image/x-icon',
+    href: '/favicon.ico',
+  },
+  {
+    rel: 'apple-touch-icon',
+    href: '/apple-touch-icon.png',
+  },
+  {
+    rel: 'manifest',
+    href: '/manifest.webmanifest',
+  },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -39,7 +60,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <AppNav />
         {children}
         <ScrollRestoration />
         <Scripts />

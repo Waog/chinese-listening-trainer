@@ -20,6 +20,9 @@ export default defineConfig(() => ({
     !process.env.VITEST && reactRouter(),
     VitePWA({
       registerType: 'autoUpdate',
+      devOptions: {
+        enabled: false, // Disable PWA in development to avoid routing conflicts
+      },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
         name: 'Chinese Listening Trainer',
@@ -53,7 +56,7 @@ export default defineConfig(() => ({
   //  plugins: [ nxViteTsPaths() ],
   // },
   build: {
-    outDir: './dist',
+    outDir: './build/client',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {
