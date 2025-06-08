@@ -6,8 +6,12 @@ export function App() {
     // Register PWA service worker only in production
     if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
       window.addEventListener('load', () => {
+        const swPath =
+          process.env.NODE_ENV === 'production'
+            ? '/chinese-listening-trainer/sw.js'
+            : '/sw.js';
         navigator.serviceWorker
-          .register('/sw.js')
+          .register(swPath)
           .then((registration) => {
             console.log('SW registered: ', registration);
           })
