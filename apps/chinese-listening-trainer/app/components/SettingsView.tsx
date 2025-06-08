@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AppSettings } from '../types';
-import { loadSettings, saveSettings } from '../utils/storage';
+import { loadSettings, saveSettings, StatsManager } from '../utils/storage';
+import { getDarkenedTrainingWeightColor } from '../utils/training-weights';
 import styles from './SettingsView.module.scss';
 
 export const SettingsView: React.FC = () => {
@@ -313,6 +314,32 @@ export const SettingsView: React.FC = () => {
           </div>
         </section>
 
+        {/* Display Settings */}
+        <section className={styles.settingsSection}>
+          <h2>Display Settings</h2>
+
+          <div className={styles.settingGroup}>
+            <label className={styles.settingLabel}>
+              <input
+                type="checkbox"
+                checked={settings.showTrainingWeightColors || false}
+                onChange={(e) =>
+                  handleSettingChange(
+                    'showTrainingWeightColors',
+                    e.target.checked
+                  )
+                }
+                className={styles.settingCheckbox}
+              />
+              Show training weight colors on filter buttons
+            </label>
+            <p className={styles.settingDescription}>
+              When enabled, filter buttons will be colored based on training
+              weights (red = needs practice, green = mastered)
+            </p>
+          </div>
+        </section>
+
         {/* Training Filters */}
         <section className={styles.settingsSection}>
           <h2>Training Filters</h2>
@@ -335,54 +362,161 @@ export const SettingsView: React.FC = () => {
           </div>
 
           <div className={styles.threeColumnGroup}>
+            {' '}
             <div className={styles.settingGroup}>
-              <label className={styles.settingLabel}>Tones</label>
+              <label className={styles.settingLabel}>Tones</label>{' '}
               <div className={styles.toggleGroup}>
-                {allTones.map(({ tone, accent }) => (
-                  <button
-                    key={tone}
-                    className={`${styles.toggleButton} ${styles.toneButton} ${
-                      settings.tones.includes(tone) ? styles.active : ''
-                    }`}
-                    onClick={() => handleArrayToggle('tones', tone)}
-                  >
-                    {tone} <span className={styles.accent}>{accent}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+                {' '}
+                {allTones.map(({ tone, accent }) => {
+                  const trainingWeight = StatsManager.getTrainingWeight(
+                    'tone',
+                    tone.toString()
+                  );
+                  const isActive = settings.tones.includes(tone);
+                  const showColors = settings.showTrainingWeightColors;
 
+                  let buttonStyle = {};
+                  if (showColors) {
+                    if (isActive) {
+                      // Enabled button: color background, white bold text
+                      const bgColor =
+                        getDarkenedTrainingWeightColor(trainingWeight);
+                      buttonStyle = {
+                        backgroundColor: bgColor,
+                        color: 'white',
+                        fontWeight: 'bold',
+                        border: '1px solid transparent',
+                      };
+                    } else {
+                      // Disabled button: no background, neutral border, light grey text
+                      buttonStyle = {
+                        backgroundColor: 'transparent',
+                        color: '#888',
+                        fontWeight: 'normal',
+                        border: '1px solid #555',
+                      };
+                    }
+                  }
+
+                  return (
+                    <button
+                      key={tone}
+                      className={`${styles.toggleButton} ${styles.toneButton} ${
+                        isActive ? styles.active : ''
+                      }`}
+                      style={buttonStyle}
+                      onClick={() => handleArrayToggle('tones', tone)}
+                      title={`Training weight: ${Math.round(trainingWeight)}%`}
+                    >
+                      {tone} <span className={styles.accent}>{accent}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>{' '}
             <div className={styles.settingGroup}>
               <label className={styles.settingLabel}>Initials</label>
               <div className={styles.toggleGroup}>
-                {allInitials.map((initial) => (
-                  <button
-                    key={initial}
-                    className={`${styles.toggleButton} ${
-                      settings.initials.includes(initial) ? styles.active : ''
-                    }`}
-                    onClick={() => handleArrayToggle('initials', initial)}
-                  >
-                    {initial}
-                  </button>
-                ))}
-              </div>
-            </div>
+                {' '}
+                {allInitials.map((initial) => {
+                  const initialKey =
+                    initial === '-' ? '' : initial.replace('-', '');
+                  const trainingWeight = StatsManager.getTrainingWeight(
+                    'initial',
+                    initialKey
+                  );
+                  const isActive = settings.initials.includes(initial);
+                  const showColors = settings.showTrainingWeightColors;
 
+                  let buttonStyle = {};
+                  if (showColors) {
+                    if (isActive) {
+                      // Enabled button: color background, white bold text
+                      const bgColor =
+                        getDarkenedTrainingWeightColor(trainingWeight);
+                      buttonStyle = {
+                        backgroundColor: bgColor,
+                        color: 'white',
+                        fontWeight: 'bold',
+                        border: '1px solid transparent',
+                      };
+                    } else {
+                      // Disabled button: no background, neutral border, light grey text
+                      buttonStyle = {
+                        backgroundColor: 'transparent',
+                        color: '#888',
+                        fontWeight: 'normal',
+                        border: '1px solid #555',
+                      };
+                    }
+                  }
+
+                  return (
+                    <button
+                      key={initial}
+                      className={`${styles.toggleButton} ${
+                        isActive ? styles.active : ''
+                      }`}
+                      style={buttonStyle}
+                      onClick={() => handleArrayToggle('initials', initial)}
+                      title={`Training weight: ${Math.round(trainingWeight)}%`}
+                    >
+                      {initial}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>{' '}
             <div className={styles.settingGroup}>
               <label className={styles.settingLabel}>Finals</label>
               <div className={styles.toggleGroup}>
-                {allFinals.map((final) => (
-                  <button
-                    key={final}
-                    className={`${styles.toggleButton} ${
-                      settings.finals.includes(final) ? styles.active : ''
-                    }`}
-                    onClick={() => handleArrayToggle('finals', final)}
-                  >
-                    {final}
-                  </button>
-                ))}
+                {' '}
+                {allFinals.map((final) => {
+                  const finalKey = final.replace('-', '');
+                  const trainingWeight = StatsManager.getTrainingWeight(
+                    'final',
+                    finalKey
+                  );
+                  const isActive = settings.finals.includes(final);
+                  const showColors = settings.showTrainingWeightColors;
+
+                  let buttonStyle = {};
+                  if (showColors) {
+                    if (isActive) {
+                      // Enabled button: color background, white bold text
+                      const bgColor =
+                        getDarkenedTrainingWeightColor(trainingWeight);
+                      buttonStyle = {
+                        backgroundColor: bgColor,
+                        color: 'white',
+                        fontWeight: 'bold',
+                        border: '1px solid transparent',
+                      };
+                    } else {
+                      // Disabled button: no background, neutral border, light grey text
+                      buttonStyle = {
+                        backgroundColor: 'transparent',
+                        color: '#888',
+                        fontWeight: 'normal',
+                        border: '1px solid #555',
+                      };
+                    }
+                  }
+
+                  return (
+                    <button
+                      key={final}
+                      className={`${styles.toggleButton} ${
+                        isActive ? styles.active : ''
+                      }`}
+                      style={buttonStyle}
+                      onClick={() => handleArrayToggle('finals', final)}
+                      title={`Training weight: ${Math.round(trainingWeight)}%`}
+                    >
+                      {final}
+                    </button>
+                  );
+                })}
               </div>{' '}
             </div>
           </div>

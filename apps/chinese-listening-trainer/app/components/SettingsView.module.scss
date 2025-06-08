@@ -211,35 +211,27 @@
 
 .settingSlider {
   width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-  outline: none;
-  margin: 0.5rem 0;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+  cursor: pointer;
 
   &::-webkit-slider-thumb {
     appearance: none;
     width: 20px;
     height: 20px;
-    background: white;
+    background: #007acc;
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-
-    &:hover {
-      transform: scale(1.1);
-    }
   }
 
   &::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    background: white;
+    background: #007acc;
     border-radius: 50%;
     cursor: pointer;
     border: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -306,10 +298,11 @@
   &:hover {
     background: #3a3a3a;
   }
-
   &.active {
     background: #007acc;
     border-color: #007acc;
+    // Remove heavy border and box-shadow when color coding is enabled
+    // The styling will be overridden by inline styles in that case
   }
 
   &:focus {
@@ -406,6 +399,19 @@
   font-size: 0.9rem;
   margin-top: 0.5rem;
   font-style: italic;
+}
+
+.settingCheckbox {
+  margin-right: 0.5rem;
+  transform: scale(1.2);
+  accent-color: #007acc;
+}
+
+.settingDescription {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0 0;
+  line-height: 1.4;
 }
 
 // Animation for smooth loading

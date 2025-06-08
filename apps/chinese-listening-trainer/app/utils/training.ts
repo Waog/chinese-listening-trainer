@@ -112,47 +112,155 @@ export class TrainingGenerator {
     existingSyllables: PinyinSyllable[],
     availableSyllables: Array<{ hanzi: string; pinyin: string; tone: number }>
   ): PinyinSyllable | null {
-    if (availableSyllables.length === 0) {
+    // Select initial, final, and tone independently based on their individual training weights
+    const selectedInitial = this.selectWeightedComponent(
+      settings.enabledInitials,
+      'initial'
+    );
+    const selectedFinal = this.selectWeightedComponent(
+      settings.enabledFinals,
+      'final'
+    );
+    const selectedTone = this.selectWeightedComponent(
+      settings.enabledTones.map((t) => t.toString()),
+      'tone'
+    );
+
+    if (!selectedFinal || selectedTone === null) {
       return null;
     }
 
-    // Weight syllables based on error rates
-    const weights = availableSyllables.map((char) => {
-      const syllableKey = `${char.pinyin}_${char.tone}`;
-      const errorRate = StatsManager.getErrorRate('syllable', syllableKey);
+    const toneNumber = parseInt(selectedTone);
+    const pinyinString = (selectedInitial || '') + selectedFinal;
 
-      // Higher error rate = higher weight (more likely to be selected)
-      // Ensure minimum weight for mastered items
-      const weight = Math.max(errorRate, 5);
+    // Check if this syllable combination actually exists in VALID_SYLLABLES
+    const validSyllable = availableSyllables.find(
+      (char) => char.pinyin === pinyinString && char.tone === toneNumber
+    );
 
-      return { character: char, weight };
+    if (!validSyllable) {
+      // If the combination doesn't exist, fall back to a valid syllable
+      // Weight available syllables based on how close they are to our selected components
+      const weights = availableSyllables.map((char) => {
+        let weight = 1;
+
+        // Extract initial and final from the valid syllable
+        const { initial: charInitial, final: charFinal } =
+          this.extractInitialFinal(char.pinyin);
+
+        // Boost weight if components match our selections
+        if (charInitial === (selectedInitial || '')) weight *= 3;
+        if (charFinal === selectedFinal) weight *= 3;
+        if (char.tone === toneNumber) weight *= 3;
+
+        return { character: char, weight };
+      });
+
+      return this.selectFromWeightedList(weights);
+    }
+
+    return {
+      initial: selectedInitial || '',
+      final: selectedFinal,
+      tone: toneNumber,
+    };
+  }
+
+  private static selectWeightedComponent(
+    components: string[],
+    componentType: string
+  ): string | null {
+    if (components.length === 0) return null;
+
+    // Create weights for each component based on training statistics
+    const weights = components.map((component) => {
+      const weight = StatsManager.getTrainingWeight(componentType, component);
+      return { component, weight };
     });
 
-    // Weighted random selection
     const totalWeight = weights.reduce((sum, w) => sum + w.weight, 0);
     if (totalWeight === 0) {
-      // Fallback to equal weights
-      const randomChar =
-        availableSyllables[
-          Math.floor(Math.random() * availableSyllables.length)
-        ];
-      return this.characterToSyllable(randomChar);
+      // Fallback to random selection
+      return components[Math.floor(Math.random() * components.length)];
     }
 
     let random = Math.random() * totalWeight;
-
     for (const weightedItem of weights) {
       random -= weightedItem.weight;
       if (random <= 0) {
-        const char = weightedItem.character;
-        return this.characterToSyllable(char);
+        return weightedItem.component;
       }
     }
 
-    // Fallback to truly random
-    const randomChar =
-      availableSyllables[Math.floor(Math.random() * availableSyllables.length)];
-    return this.characterToSyllable(randomChar);
+    // Fallback
+    return components[Math.floor(Math.random() * components.length)];
+  }
+
+  private static extractInitialFinal(pinyin: string): {
+    initial: string;
+    final: string;
+  } {
+    // Use the same logic as characterToSyllable to extract initial and final
+    const initials = [
+      'zh',
+      'ch',
+      'sh',
+      'b',
+      'p',
+      'm',
+      'f',
+      'd',
+      't',
+      'n',
+      'l',
+      'g',
+      'k',
+      'h',
+      'j',
+      'q',
+      'x',
+      'r',
+      'z',
+      'c',
+      's',
+      'y',
+      'w',
+    ];
+
+    let initial = '';
+    let final = pinyin;
+
+    for (const init of initials) {
+      if (pinyin.startsWith(init)) {
+        initial = init;
+        final = pinyin.substring(init.length);
+        break;
+      }
+    }
+
+    return { initial, final };
+  }
+
+  private static selectFromWeightedList(
+    weights: Array<{
+      character: { hanzi: string; pinyin: string; tone: number };
+      weight: number;
+    }>
+  ): PinyinSyllable | null {
+    const totalWeight = weights.reduce((sum, w) => sum + w.weight, 0);
+    if (totalWeight === 0) {
+      return null;
+    }
+
+    let random = Math.random() * totalWeight;
+    for (const weightedItem of weights) {
+      random -= weightedItem.weight;
+      if (random <= 0) {
+        return this.characterToSyllable(weightedItem.character);
+      }
+    }
+
+    return null;
   }
 
   private static characterToSyllable(char: {
@@ -205,14 +313,13 @@ export class TrainingGenerator {
       tone: char.tone,
     };
   }
-
   private static applyRealisticHeuristics(
     syllables: PinyinSyllable[]
   ): PinyinSyllable[] {
     const improved = [...syllables];
 
-    // Heuristic 1: Neutral tone should never be first
-    if (improved.length > 0 && improved[0].tone === 5) {
+    // Heuristic 1: Neutral tone should never be first (only for multi-syllable sequences)
+    if (improved.length > 1 && improved[0].tone === 5) {
       improved[0] = this.getAlternativeSyllable(improved[0], [1, 2, 3, 4]);
     }
 
@@ -231,13 +338,13 @@ export class TrainingGenerator {
       }
     }
 
-    // Heuristic 3: Limit neutral tone to one occurrence maximum
+    // Heuristic 3: Limit neutral tone to two occurrences maximum (relaxed from one)
     const neutralCount = improved.filter((s) => s.tone === 5).length;
-    if (neutralCount > 1) {
+    if (neutralCount > 2) {
       let neutralFixed = 0;
       for (
         let i = 0;
-        i < improved.length && neutralFixed < neutralCount - 1;
+        i < improved.length && neutralFixed < neutralCount - 2;
         i++
       ) {
         if (improved[i].tone === 5) {
@@ -275,13 +382,13 @@ export class TrainingGenerator {
       tone: newTone,
     };
   }
-
   // Validation function to check if syllable combination sounds natural
   static isNaturalCombination(syllables: PinyinSyllable[]): boolean {
     if (syllables.length === 0) return false;
 
     // Check basic heuristics
-    if (syllables[0].tone === 5) return false; // No neutral tone first
+    // Only restrict neutral tone first for multi-syllable sequences
+    if (syllables.length > 1 && syllables[0].tone === 5) return false;
 
     // Check for three consecutive Tone 3
     for (let i = 0; i < syllables.length - 2; i++) {
@@ -294,9 +401,9 @@ export class TrainingGenerator {
       }
     }
 
-    // Check neutral tone count
+    // Check neutral tone count (relaxed to allow up to 2)
     const neutralCount = syllables.filter((s) => s.tone === 5).length;
-    if (neutralCount > 1) return false;
+    if (neutralCount > 2) return false;
 
     return true;
   }

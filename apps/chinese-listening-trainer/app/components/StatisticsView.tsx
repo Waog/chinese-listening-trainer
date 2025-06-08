@@ -1,14 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
+import { formatPinyinWithTones } from '../data/phonetics';
 import { Statistics } from '../types';
 import { StatsManager } from '../utils/storage';
+import { getTrainingWeightColor } from '../utils/training-weights';
 import styles from './StatisticsView.module.scss';
 
-type SortBy =
-  | 'component'
-  | 'value'
-  | 'attempts'
-  | 'successRate'
-  | 'lastTrained';
+type SortBy = 'value' | 'attempts' | 'successRate' | 'probability';
 type SortOrder = 'asc' | 'desc';
 type FilterComponent =
   | 'all'
@@ -22,26 +19,40 @@ export function StatisticsView() {
   const [statistics, setStatistics] = useState<Statistics[]>([]);
   const [sortBy, setSortBy] = useState<SortBy>('successRate');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-  const [filterComponent, setFilterComponent] =
-    useState<FilterComponent>('all');
+
+  // Initialize activeFilters from localStorage or use default
+  const [activeFilters, setActiveFilters] = useState<Set<FilterComponent>>(
+    () => {
+      const savedFilters = StatsManager.loadStatisticsFilters();
+      if (savedFilters) {
+        return new Set(savedFilters as FilterComponent[]);
+      }
+      return new Set(['initial', 'final', 'tone', 'syllable', 'combination']);
+    }
+  );
+
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     loadStatistics();
   }, []);
 
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    StatsManager.saveStatisticsFilters(Array.from(activeFilters));
+  }, [activeFilters]);
+
   const loadStatistics = () => {
     const stats = StatsManager.getStatistics();
     setStatistics(stats);
   };
-
   const filteredAndSortedStats = useMemo(() => {
     let filtered = statistics;
 
-    // Filter by component type
-    if (filterComponent !== 'all') {
-      filtered = filtered.filter((stat) => stat.component === filterComponent);
-    }
+    // Filter by component type - only show components that are in activeFilters
+    filtered = filtered.filter((stat) =>
+      activeFilters.has(stat.component as FilterComponent)
+    );
 
     // Filter by search term
     if (searchTerm) {
@@ -55,17 +66,21 @@ export function StatisticsView() {
       let valueA: string | number, valueB: string | number;
 
       switch (sortBy) {
-        case 'component':
         case 'value':
           valueA = a[sortBy].toLowerCase();
           valueB = b[sortBy].toLowerCase();
           break;
         case 'attempts':
         case 'successRate':
-        case 'lastTrained':
           valueA = a[sortBy];
           valueB = b[sortBy];
           break;
+        case 'probability': {
+          // Use shared training weight calculation
+          valueA = StatsManager.getTrainingWeight(a.component, a.value);
+          valueB = StatsManager.getTrainingWeight(b.component, b.value);
+          break;
+        }
         default:
           return 0;
       }
@@ -76,7 +91,7 @@ export function StatisticsView() {
     });
 
     return filtered;
-  }, [statistics, sortBy, sortOrder, filterComponent, searchTerm]);
+  }, [statistics, sortBy, sortOrder, activeFilters, searchTerm]);
 
   const handleSort = (column: SortBy) => {
     if (sortBy === column) {
@@ -91,54 +106,51 @@ export function StatisticsView() {
     if (sortBy !== column) return '↕️';
     return sortOrder === 'asc' ? '⬆️' : '⬇️';
   };
-
   const getSuccessRateColor = (rate: number) => {
     if (rate >= 90) return styles.excellent;
     if (rate >= 75) return styles.good;
     if (rate >= 50) return styles.okay;
     return styles.poor;
   };
-
-  const formatLastTrained = (timestamp: number) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    return date.toLocaleDateString();
-  };
-
-  const getComponentDisplayName = (component: string) => {
-    switch (component) {
-      case 'initial':
-        return 'Initial';
-      case 'final':
-        return 'Final';
-      case 'tone':
-        return 'Tone';
-      case 'syllable':
-        return 'Syllable';
-      case 'combination':
-        return 'Combination';
-      default:
-        return component;
-    }
-  };
-
   const formatValue = (component: string, value: string) => {
     switch (component) {
       case 'tone':
         return `Tone ${value}`;
       case 'initial':
-        return value || '∅ (empty)';
-      case 'syllable':
-        return value.replace('_', ' T');
-      case 'combination':
-        return value.replace(/\+/g, ' + ').replace(/_/g, ' T');
+        return value ? `${value}-` : '-';
+      case 'final':
+        return `-${value}`;
+      case 'syllable': {
+        // Convert "wu_3" to pinyin with accents
+        const [syllablePinyin, toneStr] = value.split('_');
+        if (toneStr) {
+          const tone = parseInt(toneStr);
+          return formatPinyinWithTones({
+            initial: '',
+            final: syllablePinyin,
+            tone: tone,
+          });
+        }
+        return value;
+      }
+      case 'combination': {
+        // Convert "wu_3+guan_1" to "wǔ guān" (space instead of plus)
+        return value
+          .split('+')
+          .map((part) => {
+            const [syllablePinyin, toneStr] = part.split('_');
+            if (toneStr) {
+              const tone = parseInt(toneStr);
+              return formatPinyinWithTones({
+                initial: '',
+                final: syllablePinyin,
+                tone: tone,
+              });
+            }
+            return part;
+          })
+          .join(' ');
+      }
       default:
         return value;
     }
@@ -215,28 +227,41 @@ export function StatisticsView() {
             </div>
           </div>
         )}
-      </div>
-
+      </div>{' '}
       <div className={styles.filters}>
-        <div className={styles.filterGroup}>
-          <label htmlFor="componentFilter">Component Type:</label>
-          <select
-            id="componentFilter"
-            value={filterComponent}
-            onChange={(e) =>
-              setFilterComponent(e.target.value as FilterComponent)
-            }
-            className={styles.select}
-          >
-            <option value="all">All Components</option>
-            <option value="initial">Initials</option>
-            <option value="final">Finals</option>
-            <option value="tone">Tones</option>
-            <option value="syllable">Syllables</option>
-            <option value="combination">Combinations</option>
-          </select>
+        {' '}
+        <div className={styles.componentToggleGroup}>
+          <label>Component Type:</label>
+          <div className={styles.toggleButtons}>
+            {[
+              { value: 'initial', label: 'Initials' },
+              { value: 'final', label: 'Finals' },
+              { value: 'tone', label: 'Tones' },
+              { value: 'syllable', label: 'Syllables' },
+              { value: 'combination', label: 'Combinations' },
+            ].map((filter) => (
+              <button
+                key={filter.value}
+                className={`${styles.toggleButton} ${
+                  activeFilters.has(filter.value as FilterComponent)
+                    ? styles.active
+                    : ''
+                }`}
+                onClick={() => {
+                  const newFilters = new Set(activeFilters);
+                  if (newFilters.has(filter.value as FilterComponent)) {
+                    newFilters.delete(filter.value as FilterComponent);
+                  } else {
+                    newFilters.add(filter.value as FilterComponent);
+                  }
+                  setActiveFilters(newFilters);
+                }}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
         </div>
-
         <div className={styles.filterGroup}>
           <label htmlFor="search">Search:</label>
           <input
@@ -248,12 +273,10 @@ export function StatisticsView() {
             className={styles.searchInput}
           />
         </div>
-
         <button onClick={clearAllStats} className={styles.clearButton}>
           Clear All Stats
         </button>
       </div>
-
       {filteredAndSortedStats.length === 0 ? (
         <div className={styles.emptyState}>
           <h3>No Statistics Yet</h3>
@@ -261,12 +284,10 @@ export function StatisticsView() {
         </div>
       ) : (
         <div className={styles.tableContainer}>
+          {' '}
           <table className={styles.statsTable}>
             <thead>
               <tr>
-                <th onClick={() => handleSort('component')}>
-                  Component {getSortIcon('component')}
-                </th>
                 <th onClick={() => handleSort('value')}>
                   Value {getSortIcon('value')}
                 </th>
@@ -275,9 +296,9 @@ export function StatisticsView() {
                 </th>
                 <th onClick={() => handleSort('successRate')}>
                   Success Rate {getSortIcon('successRate')}
-                </th>
-                <th onClick={() => handleSort('lastTrained')}>
-                  Last Trained {getSortIcon('lastTrained')}
+                </th>{' '}
+                <th onClick={() => handleSort('probability')}>
+                  Training Weight {getSortIcon('probability')}
                 </th>
               </tr>
             </thead>
@@ -287,20 +308,14 @@ export function StatisticsView() {
                   key={`${stat.component}-${stat.value}`}
                   className={styles.statRow}
                 >
-                  <td className={styles.componentCell}>
-                    <span className={styles.componentBadge}>
-                      {getComponentDisplayName(stat.component)}
-                    </span>
-                  </td>
                   <td className={styles.valueCell}>
                     {formatValue(stat.component, stat.value)}
-                  </td>
+                  </td>{' '}
                   <td className={styles.attemptsCell}>
-                    <span className={styles.attempts}>{stat.attempts}</span>
-                    <span className={styles.successes}>
-                      ({stat.successes} correct)
+                    <span className={styles.attempts}>
+                      {stat.successes} / {stat.attempts}
                     </span>
-                  </td>
+                  </td>{' '}
                   <td className={styles.successRateCell}>
                     <div
                       className={`${styles.successRate} ${getSuccessRateColor(
@@ -315,9 +330,27 @@ export function StatisticsView() {
                         style={{ width: `${stat.successRate}%` }}
                       ></div>
                     </div>
-                  </td>
-                  <td className={styles.lastTrainedCell}>
-                    {formatLastTrained(stat.lastTrained)}
+                  </td>{' '}
+                  <td className={styles.probabilityCell}>
+                    <div
+                      className={styles.probability}
+                      style={{
+                        color: getTrainingWeightColor(
+                          StatsManager.getTrainingWeight(
+                            stat.component,
+                            stat.value
+                          )
+                        ),
+                      }}
+                    >
+                      {Math.round(
+                        StatsManager.getTrainingWeight(
+                          stat.component,
+                          stat.value
+                        )
+                      )}
+                      %
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -325,7 +358,6 @@ export function StatisticsView() {
           </table>
         </div>
       )}
-
       <div className={styles.summary}>
         <p>
           Showing {filteredAndSortedStats.length} of {statistics.length} items

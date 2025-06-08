@@ -3,6 +3,7 @@ import { formatPinyinWithTones } from '../data/phonetics';
 import { PinyinSyllable, TrainingSession } from '../types';
 import { SessionManager, StatsManager, loadSettings } from '../utils/storage';
 import { TrainingGenerator } from '../utils/training';
+import { formatComponentWithWeight } from '../utils/training-weights';
 import { TTSManager } from '../utils/tts';
 import styles from './TrainingView.module.scss';
 
@@ -294,18 +295,53 @@ export function TrainingView() {
                   {formatPinyinWithTones(syllable)}
                 </span>
               ))}
-            </div>
-
+            </div>{' '}
             <div className={styles.syllableBreakdown}>
-              {currentSyllables.map((syllable, index) => (
-                <div key={index} className={styles.breakdown}>
-                  <span className={styles.component}>
-                    {syllable.initial || '∅'}
-                  </span>
-                  <span className={styles.component}>{syllable.final}</span>
-                  <span className={styles.toneNumber}>T{syllable.tone}</span>
-                </div>
-              ))}
+              {currentSyllables.map((syllable, index) => {
+                const initialInfo = formatComponentWithWeight(
+                  syllable.initial || '',
+                  'initial'
+                );
+                const finalInfo = formatComponentWithWeight(
+                  syllable.final,
+                  'final'
+                );
+                const toneInfo = formatComponentWithWeight(
+                  syllable.tone.toString(),
+                  'tone',
+                  false
+                );
+
+                return (
+                  <div key={index} className={styles.breakdown}>
+                    <span
+                      className={styles.component}
+                      style={{ color: initialInfo.color }}
+                      title={`Training weight: ${Math.round(
+                        initialInfo.weight
+                      )}%`}
+                    >
+                      {initialInfo.text}
+                    </span>
+                    <span
+                      className={styles.component}
+                      style={{ color: finalInfo.color }}
+                      title={`Training weight: ${Math.round(
+                        finalInfo.weight
+                      )}%`}
+                    >
+                      {finalInfo.text}
+                    </span>
+                    <span
+                      className={styles.toneNumber}
+                      style={{ color: toneInfo.color }}
+                      title={`Training weight: ${Math.round(toneInfo.weight)}%`}
+                    >
+                      T{syllable.tone} {Math.round(toneInfo.weight)}%
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

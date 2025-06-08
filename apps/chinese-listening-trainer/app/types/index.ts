@@ -43,6 +43,7 @@ export interface AppSettings {
   finals: string[];
   tones: number[];
   theme: 'dark';
+  showTrainingWeightColors: boolean;
 }
 
 export interface TrainingFilters {

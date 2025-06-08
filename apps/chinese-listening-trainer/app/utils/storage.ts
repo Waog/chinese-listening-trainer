@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   STATISTICS: 'chinese-trainer-statistics',
   SESSIONS: 'chinese-trainer-sessions',
   SETTINGS: 'chinese-trainer-settings',
+  STATISTICS_FILTERS: 'chinese-trainer-statistics-filters',
 };
 
 // Default settings
@@ -139,12 +140,39 @@ export class StatsManager {
     );
     return stat ? stat.successRate : -1; // -1 indicates never trained
   }
-
   // Get error rate for prioritization (higher error rate = more frequent training)
   static getErrorRate(component: string, value: string): number {
     const successRate = this.getSuccessRate(component, value);
     if (successRate === -1) return 1000; // High priority for untrainied items
     return 100 - successRate;
+  }
+  // Get training weight (shared function for both training algorithm and statistics display)
+  static getTrainingWeight(component: string, value: string): number {
+    const errorRate = this.getErrorRate(component, value);
+    // Apply linear weight with 5% minimum for mastered items and 1000% for untrained
+    return Math.max(errorRate, 5);
+  }
+
+  // Statistics filter persistence
+  static saveStatisticsFilters(filters: string[]): void {
+    try {
+      localStorage.setItem(
+        STORAGE_KEYS.STATISTICS_FILTERS,
+        JSON.stringify(filters)
+      );
+    } catch (error) {
+      console.error('Error saving statistics filters:', error);
+    }
+  }
+
+  static loadStatisticsFilters(): string[] | null {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.STATISTICS_FILTERS);
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      console.error('Error loading statistics filters:', error);
+      return null;
+    }
   }
 }
 
@@ -287,6 +315,7 @@ const DEFAULT_APP_SETTINGS: AppSettings = {
   ],
   tones: [1, 2, 3, 4, 5],
   theme: 'dark',
+  showTrainingWeightColors: true,
 };
 
 export function loadSettings(): AppSettings {
