@@ -20,7 +20,7 @@ export const meta: MetaFunction = () => [
   },
   {
     name: 'theme-color',
-    content: '#ffffff',
+    content: '#667eea',
   },
 ];
 

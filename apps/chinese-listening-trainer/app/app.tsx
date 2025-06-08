@@ -1,7 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './app.module.scss';
 
+// Add BeforeInstallPromptEvent interface
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export function App() {
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
+
   useEffect(() => {
     // Register PWA service worker only in production
     if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
@@ -20,13 +30,63 @@ export function App() {
           });
       });
     }
+
+    // Listen for the beforeinstallprompt event
+    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      setDeferredPrompt(e);
+      // Show install button
+      setShowInstallButton(true);
+    };
+
+    window.addEventListener(
+      'beforeinstallprompt',
+      handleBeforeInstallPrompt as EventListener
+    );
+
+    // Listen for the app installed event
+    const handleAppInstalled = () => {
+      console.log('PWA was installed');
+      setShowInstallButton(false);
+      setDeferredPrompt(null);
+    };
+
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener(
+        'beforeinstallprompt',
+        handleBeforeInstallPrompt as EventListener
+      );
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
   }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      // Show the install prompt
+      deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      // Clear the deferredPrompt so it can only be used once
+      setDeferredPrompt(null);
+      setShowInstallButton(false);
+    }
+  };
 
   return (
     <div className={styles.app}>
       <header className={styles.header}>
         <h1>Chinese Listening Trainer</h1>
         <p>A Progressive Web App for improving your Chinese listening skills</p>
+        {showInstallButton && (
+          <button onClick={handleInstallClick} className={styles.installButton}>
+            📱 Install App
+          </button>
+        )}
       </header>
 
       <main className={styles.main}>

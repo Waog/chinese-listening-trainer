@@ -28,26 +28,56 @@ export default defineConfig(() => ({
         name: 'Chinese Listening Trainer',
         short_name: 'ChineseTrainer',
         description: 'A Progressive Web App for Chinese listening training',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        theme_color: '#667eea',
+        background_color: '#667eea',
         display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        orientation: 'portrait',
+        scope:
+          process.env.NODE_ENV === 'production'
+            ? '/chinese-listening-trainer/'
+            : '/',
+        start_url:
+          process.env.NODE_ENV === 'production'
+            ? '/chinese-listening-trainer/'
+            : '/',
+        lang: 'en',
+        categories: ['education', 'productivity'],
         icons: [
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'any maskable',
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any maskable',
+          },
+          {
+            src: 'apple-touch-icon.png',
+            sizes: '180x180',
+            type: 'image/png',
+            purpose: 'apple touch icon',
           },
         ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // <== 365 days
+              },
+            },
+          },
+        ],
       },
     }),
   ],
